@@ -1,0 +1,3 @@
+displayName = Vein Miner
+author = Justin (justinbrick)
+version = 1.0.0
