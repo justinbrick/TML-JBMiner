@@ -28,6 +28,7 @@ namespace JBMiner.Systems
                 newBlocks.RemoveAt(0);
             }
             // Now finally break each block.
+            Main.NewText(blocksToMine.Count); // Get the count of the blocks?
             _ = DestroyTiles(blocksToMine);
         }
 
@@ -45,6 +46,11 @@ namespace JBMiner.Systems
             }
         }
 
+        private static bool SameAs(Tile first, Tile second) // Compares the two tiles but doesn't look at slopes.
+        {
+            return first.IsActive && second.IsActive && first.type == second.type;
+        }
+
         internal IEnumerable<(int, int)> GetNearbyBlocks(Tile match, int i, int j)
         {
             for (int x = -1; x < 2; ++x)
@@ -52,7 +58,7 @@ namespace JBMiner.Systems
                 for (int y = -1; y < 2; ++y)
                 {
                     var tile = Main.tile[i + x, j + y];
-                    if (x + y == 0 || tile is null || _alreadyMined.ContainsKey(tile) || !tile.IsTheSameAs(match)) continue;
+                    if (tile is null || tile == match || _alreadyMined.ContainsKey(tile) || !SameAs(match, tile) ) continue; //!tile.IsTheSameAs(match)
                     _alreadyMined.TryAdd(tile, true);
                     yield return (i + x, j + y);
                 }
