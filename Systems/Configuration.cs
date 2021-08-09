@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
-using On.Terraria.UI;
 using Terraria.ModLoader.Config;
 
 namespace JBMiner.Systems
 {
     public class Configuration : ModConfig
     {
-        [JsonIgnore] internal static Configuration instance;
+        [JsonIgnore] internal static Configuration Instance;
         [JsonIgnore]
         public override ConfigScope Mode { get; } = ConfigScope.ClientSide;
         [DefaultValue(500)] public int BlockLimit; // This is the max amount of blocks we can break at any given time.
@@ -16,10 +15,10 @@ namespace JBMiner.Systems
         public override bool Autoload(ref string name)
         {
             name = "Configuration";
-            instance ??= this;
+            Instance ??= this;
             return base.Autoload(ref name);
         }
-
+        
         public List<int> Whitelist = DefaultWhitelist;
         
         [JsonIgnore]
