@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using On.Terraria.UI;
 using Terraria.ModLoader.Config;
@@ -14,11 +15,33 @@ namespace JBMiner.Systems
 
         public override bool Autoload(ref string name)
         {
-            name = "Vein Miner";
+            name = "Configuration";
             instance ??= this;
             return base.Autoload(ref name);
         }
+
+        public List<int> Whitelist = DefaultWhitelist;
         
-        
+        [JsonIgnore]
+        internal static List<int> DefaultWhitelist = new()
+        {
+            6,
+            7,
+            8,
+            9,
+            22,
+            107,
+            108,
+            111,
+            166,
+            167,
+            168,
+            169,
+            204,
+            211,
+            221,
+            222,
+            223
+        };
     }
 }

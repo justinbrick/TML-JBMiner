@@ -15,7 +15,7 @@ namespace JBMiner.Systems
         public override void KillTile(int i, int j, int type, ref bool fail, ref bool effectOnly, ref bool noItem)
         {
             var self = Main.tile[i, j];
-            if (fail || _isMining ||  !JBMiner.Instance.VeinKeybind.Current || _alreadyMined.ContainsKey((i,j))) return;
+            if (fail || _isMining ||  !JBMiner.Instance.VeinKeybind.Current || _alreadyMined.ContainsKey((i,j)) || !Configuration.instance.Whitelist.Contains(self.type)) return;
             _isMining = true;
             var blocksToMine = GetNearbyBlocks(self, i, j).ToList();
             int index = 0;
