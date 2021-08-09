@@ -29,7 +29,6 @@ namespace JBMiner.Systems
                 ++index;
             }
 
-            Main.NewText(blocksToMine.Count);
             foreach ((int x, int y) in blocksToMine)
             {
                 WorldGen.KillTile(x,y);
