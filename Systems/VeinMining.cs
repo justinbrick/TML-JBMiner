@@ -10,11 +10,13 @@ namespace JBMiner.Systems
 {
     public class VeinMining : GlobalTile
     {
+        private static bool _isMining = false;
         private static ConcurrentDictionary<Tile, bool> _alreadyMined = new();
         public override void KillTile(int i, int j, int type, ref bool fail, ref bool effectOnly, ref bool noItem)
         {
             var self = Main.tile[i, j];
-            if (fail || !JBMiner.Instance.VeinKeybind.Current || _alreadyMined.ContainsKey(self)) return;
+            if (fail || _isMining ||  !JBMiner.Instance.VeinKeybind.Current || _alreadyMined.ContainsKey(self)) return;
+            _isMining = true;
             _alreadyMined.Clear();
             var newBlocks = GetNearbyBlocks(self, i, j).ToList();
             
@@ -27,9 +29,13 @@ namespace JBMiner.Systems
                 blocksToMine.Add((x,y));
                 newBlocks.RemoveAt(0);
             }
-            // Now finally break each block.
-            Main.NewText(blocksToMine.Count); // Get the count of the blocks?
-            _ = DestroyTiles(blocksToMine);
+
+            Task.Delay(1);
+            foreach ((int x, int y) in blocksToMine)
+            {
+                WorldGen.KillTile(x,y);
+            }
+            _isMining = false;
         }
 
         public override void Unload()
@@ -37,16 +43,7 @@ namespace JBMiner.Systems
             _alreadyMined = null;
         }
 
-        private async Task DestroyTiles(List<(int, int)> tiles)
-        {
-            foreach ((int x, int y) in tiles)
-            {
-                await Task.Delay(1);
-                WorldGen.KillTile(x,y);
-            }
-        }
-
-        private static bool SameAs(Tile first, Tile second) // Compares the two tiles but doesn't look at slopes.
+        private static bool SameAs(Tile first, Tile second)
         {
             return first.IsActive && second.IsActive && first.type == second.type;
         }
@@ -58,7 +55,7 @@ namespace JBMiner.Systems
                 for (int y = -1; y < 2; ++y)
                 {
                     var tile = Main.tile[i + x, j + y];
-                    if (tile is null || tile == match || _alreadyMined.ContainsKey(tile) || !SameAs(match, tile) ) continue; //!tile.IsTheSameAs(match)
+                    if (tile is null || tile == match || _alreadyMined.ContainsKey(tile) || !SameAs(match, tile) ) continue; 
                     _alreadyMined.TryAdd(tile, true);
                     yield return (i + x, j + y);
                 }
