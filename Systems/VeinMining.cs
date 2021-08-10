@@ -2,7 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
+using Terraria.GameContent.UI.States;
+using Terraria.GameInput;
 using Terraria.ModLoader;
 
 namespace JBMiner.Systems
@@ -34,6 +37,11 @@ namespace JBMiner.Systems
             }
             _isMining = false;
             _alreadyMined.Clear();
+        }
+
+        public override void Load()
+        {
+            base.Load();
         }
 
         public override void Unload()

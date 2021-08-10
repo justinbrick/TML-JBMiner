@@ -3,6 +3,4 @@ Vein Miner mod for TModLoader 1.4.2.3
 Features:
 Changing control key.
 Changing block limit.
-
-TODO:
-Whitelist/Blacklist blocks.
+Block whitelist.

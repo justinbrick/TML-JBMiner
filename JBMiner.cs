@@ -1,7 +1,6 @@
 using JBMiner.Systems;
 using Microsoft.Xna.Framework.Input;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Config;
 
 namespace JBMiner
 {
