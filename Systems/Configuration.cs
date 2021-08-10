@@ -32,7 +32,7 @@ namespace JBMiner.Systems
             {
                 Whitelist = DefaultWhitelist;
                 using var writer = new StreamWriter(File.Open(FolderPath(WhitelistFileName), FileMode.Create));
-                writer.Write(JsonSerializer.Serialize(Whitelist));
+                writer.Write(JsonSerializer.Serialize(Whitelist)); // For some reason it glitches if we don't serialize and save as soon as we get this? And then it turns into null which isn't good.
             }
             return base.Autoload(ref name);
         }
@@ -44,28 +44,21 @@ namespace JBMiner.Systems
             str.Write(JsonSerializer.Serialize(Whitelist)); // This makes the whitelist a string.
         }
 
+        // This whitelist contains all the blocks that we're currently looking for while mining.
         [Newtonsoft.Json.JsonIgnore]
         public List<int> Whitelist;
         
         [Newtonsoft.Json.JsonIgnore]
-        internal static List<int> DefaultWhitelist = new()
+        internal static readonly List<int> DefaultWhitelist = new()
         {
-            6,
-            7,
-            8,
-            9,
-            22,
-            107,
-            108,
-            111,
-            166,
-            167,
-            168,
-            169,
-            204,
-            211,
-            221,
-            222,
+            6, 7, 8,
+            9, 22, 62,
+            63, 64, 65,
+            66, 67, 68,
+            107, 108, 111,
+            123, 166, 167,
+            168, 169, 204,
+            211, 221, 222,
             223
         };
     }

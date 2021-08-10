@@ -18,6 +18,7 @@ namespace JBMiner.Systems
         {
             var self = Main.tile[i, j];
             if (fail || _isMining ||  !JBMiner.Instance.VeinMine.Current || _alreadyMined.ContainsKey((i,j)) || !Configuration.Instance.Whitelist.Contains(self.type)) return;
+            _alreadyMined.TryAdd((i,j), true); // Add ourselves so we aren't mining duds.
             _isMining = true;
             var blocksToMine = GetNearbyBlocks(self, i, j).ToList();
             int index = 0;

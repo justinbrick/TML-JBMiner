@@ -3,4 +3,14 @@ Vein Miner mod for TModLoader 1.4.2.3
 Features:
 Changing control key.
 Changing block limit.
+Controls to add blocks to the whitelist/remove from whitelist.
 Block whitelist.
+
+Release version is Major/Minor/Patch format.
+
+2.0.0:
+Release version
+
+2.0.1:
+Added more tile IDs to the default whitelist.
+Fixed a bug where vein mining blocks would mine the first one twice, causing it to drop a dirt block.
