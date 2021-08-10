@@ -39,11 +39,6 @@ namespace JBMiner.Systems
             _alreadyMined.Clear();
         }
 
-        public override void Load()
-        {
-            base.Load();
-        }
-
         public override void Unload()
         {
             _alreadyMined = null;

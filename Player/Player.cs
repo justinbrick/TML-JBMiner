@@ -14,7 +14,7 @@ namespace JBMiner.Player
             {
                 var position = Main.MouseWorld.ToTileCoordinates();
                 var tile = Main.tile[position.X, position.Y];
-                if (Configuration.Instance.Whitelist.Contains(tile.type)) return;
+                if (tile is null || Configuration.Instance.Whitelist.Contains(tile.type)) return;
                 Configuration.Instance.Whitelist.Add(tile.type);
                 Main.NewText($"Added tile, ID: {tile.type}");
             }
@@ -22,7 +22,7 @@ namespace JBMiner.Player
             {
                 var position = Main.MouseWorld.ToTileCoordinates();
                 var tile = Main.tile[position.X, position.Y];
-                if (!Configuration.Instance.Whitelist.Contains(tile.type)) return;
+                if (tile is null || !Configuration.Instance.Whitelist.Contains(tile.type)) return;
                 Configuration.Instance.Whitelist.Remove(tile.type);
                 Main.NewText($"Removed tile, ID: {tile.type}");
             }

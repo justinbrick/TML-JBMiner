@@ -1,3 +1,4 @@
+using System.IO;
 using JBMiner.Systems;
 using Microsoft.Xna.Framework.Input;
 using Terraria.ModLoader;
@@ -19,10 +20,12 @@ namespace JBMiner
 			VeinMine = KeybindLoader.RegisterKeybind(this, "Vein Mine", Keys.OemTilde);
 			WhitelistAdd = KeybindLoader.RegisterKeybind(this, "Add to Whitelist", Keys.NumPad0);
 			WhitelistRemove = KeybindLoader.RegisterKeybind(this, "Remove from Whitelist", Keys.NumPad1);
+			
 		}
 		
 		public override void Unload()
 		{
+			Configuration.Instance.Unload(); 
 			Configuration.Instance = null; // Remove the configuration instance.
 			Instance = null;
 			base.Unload();
