@@ -14,17 +14,17 @@ namespace JBMiner.Player
             {
                 var position = Main.MouseWorld.ToTileCoordinates();
                 var tile = Main.tile[position.X, position.Y];
-                if (tile is null || Configuration.Instance.Whitelist.Contains(tile.type)) return;
-                Configuration.Instance.Whitelist.Add(tile.type);
-                Main.NewText($"Added tile, ID: {tile.type}");
+                if (Configuration.Instance.Whitelist.Contains(tile.TileType)) return;
+                Configuration.Instance.Whitelist.Add(tile.TileType);
+                Main.NewText($"Added tile, ID: {tile.TileType}");
             }
             else if (JBMiner.Instance.WhitelistRemove.JustPressed)
             {
                 var position = Main.MouseWorld.ToTileCoordinates();
                 var tile = Main.tile[position.X, position.Y];
-                if (tile is null || !Configuration.Instance.Whitelist.Contains(tile.type)) return;
-                Configuration.Instance.Whitelist.Remove(tile.type);
-                Main.NewText($"Removed tile, ID: {tile.type}");
+                if (!Configuration.Instance.Whitelist.Contains(tile.TileType)) return;
+                Configuration.Instance.Whitelist.Remove(tile.TileType);
+                Main.NewText($"Removed tile, ID: {tile.TileType}");
             }
         }
     }

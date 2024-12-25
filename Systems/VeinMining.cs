@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.GameContent.UI.States;
-using Terraria.GameInput;
 using Terraria.ModLoader;
 
 namespace JBMiner.Systems
@@ -14,33 +11,63 @@ namespace JBMiner.Systems
     {
         private static bool _isMining;
         private static ConcurrentDictionary<(int, int), bool> _alreadyMined = new();
-        public override void KillTile(int i, int j, int type, ref bool fail, ref bool effectOnly, ref bool noItem)
+        
+        public override void KillTile(
+            int i,
+            int j,
+            int type,
+            ref bool fail,
+            ref bool effectOnly,
+            ref bool noItem)
         {
-            var self = Main.tile[i, j];
-            if (fail || _isMining ||  !JBMiner.Instance.VeinMine.Current || _alreadyMined.ContainsKey((i,j)) || !Configuration.Instance.Whitelist.Contains(self.type)) return;
-            _alreadyMined.TryAdd((i,j), true); // Add ourselves so we aren't mining duds.
-            _isMining = true;
-            var blocksToMine = GetNearbyBlocks(self, i, j).ToList();
-            int index = 0;
-            while (index < blocksToMine.Count && blocksToMine.Count < Configuration.Instance.BlockLimit)
+            var tile = Main.tile[i, j];
+            if (fail || _isMining || _alreadyMined.ContainsKey((i, j)) || Main.worldName == string.Empty)
+                return;
+            switch (Main.netMode)
             {
-                var (x, y) = blocksToMine[index];
-                var tile = Main.tile[x, y];
-                foreach (var block in GetNearbyBlocks(tile, x, y))
-                    if (blocksToMine.Count < Configuration.Instance.BlockLimit)
-                        blocksToMine.Add(block);
-                ++index;
+                case 0:
+                    if (!JBMiner.Instance.VeinMine.Current || !Configuration.Instance.Whitelist.Contains(tile.TileType))
+                        break;
+                    DestroyNear(i, j);
+                    break;
+                case 1:
+                    if (!JBMiner.Instance.VeinMine.Current || !Configuration.Instance.Whitelist.Contains(tile.TileType))
+                        break;
+                    var packet = JBMiner.Instance.GetPacket();
+                    packet.Write((byte) 0);
+                    packet.WriteVector2(new Vector2(i, j));
+                    packet.Send();
+                    break;
             }
-
-            foreach ((int x, int y) in blocksToMine)
-            {
-                WorldGen.KillTile(x,y);
-            }
-            _isMining = false;
-            _alreadyMined.Clear();
         }
-
-        public override void Unload()
+        public static void DestroyNear(int i, int j)
+        {
+            Tile match = Main.tile[i, j];
+            _alreadyMined.TryAdd((i, j), true);
+            _isMining = true;
+            int i1 = i;
+            int j1 = j;
+            List<(int, int)> list = GetNearbyBlocks(match, i1, j1).ToList();
+            for (int index = 0; index < list.Count && list.Count < Configuration.Instance.BlockLimit; ++index)
+            {
+                (int i2, int j2) = list[index];
+                foreach ((int, int) nearbyBlock in GetNearbyBlocks(Main.tile[i2, j2], i2, j2))
+                {
+                    if (list.Count < Configuration.Instance.BlockLimit)
+                        list.Add(nearbyBlock);
+                }
+            }
+            foreach ((int num1, int num2) in list)
+            {
+                WorldGen.KillTile(num1, num2);
+                if (Main.netMode != 0)
+                    NetMessage.SendData(17, number2: (float) num1, number3: (float) num2);
+            }
+            VeinMining._isMining = false;
+            VeinMining._alreadyMined.Clear();
+        }
+        
+        public override void Unload() 
         {
             _alreadyMined = null;
         }
@@ -52,7 +79,7 @@ namespace JBMiner.Systems
                 for (int y = -1; y < 2; ++y)
                 {
                     var tile = Main.tile[i + x, j + y];
-                    if (tile is null || tile == match || _alreadyMined.ContainsKey((i+x,j+y)) || !tile.SameAs(match) ) continue; 
+                    if (tile == match || _alreadyMined.ContainsKey((i+x,j+y)) || !tile.SameAs(match) ) continue; 
                     _alreadyMined.TryAdd((i+x,j+y), true);
                     yield return (i + x, j + y);
                 }
@@ -64,7 +91,8 @@ namespace JBMiner.Systems
     {
         public static bool SameAs(this Tile first, Tile second)
         {
-            return first.IsActive && second.IsActive && first.type == second.type;
+            // Previous: IsActive, HasTile likely candidate to replace.
+            return first.HasTile && second.HasTile && first.TileType == second.TileType;
         }
     }
 }

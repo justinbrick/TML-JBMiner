@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 using ReLogic.OS;
-using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
-
 
 namespace JBMiner.Systems
 {
@@ -17,13 +14,19 @@ namespace JBMiner.Systems
 
         [DefaultValue(500)] public int BlockLimit; // This is the max amount of blocks we can break at any given time.
         [Newtonsoft.Json.JsonIgnore] private const string WhitelistFileName = "JBMinerWhitelist";
-        public static string FolderPath(string place) => Path.Combine(Platform.Get<IPathService>().GetStoragePath(), "Terraria", "ModLoader", "Beta", place);
+
+        private static string StorageDirectory = Path.Combine(Platform.Get<IPathService>().GetStoragePath(), "Terraria",
+            "tModLoader", ".jbminer");
+        private static string FolderPath(string place) => Path.Combine(StorageDirectory, place);
 
         public override bool Autoload(ref string name)
         {
             name = "Configuration";
             Instance ??= this;
-            if (File.Exists(FolderPath(WhitelistFileName)))
+
+            var configPath = FolderPath(WhitelistFileName);
+            
+            if (File.Exists(configPath))
             {
                 using var str = File.OpenText(FolderPath(WhitelistFileName));
                 Whitelist = JsonSerializer.Deserialize<List<int>>(str.ReadToEnd());
@@ -31,8 +34,10 @@ namespace JBMiner.Systems
             else
             {
                 Whitelist = DefaultWhitelist;
-                using var writer = new StreamWriter(File.Open(FolderPath(WhitelistFileName), FileMode.Create));
-                writer.Write(JsonSerializer.Serialize(Whitelist)); // For some reason it glitches if we don't serialize and save as soon as we get this? And then it turns into null which isn't good.
+                // Create Directory, to ensure it exists before storing.
+                Directory.CreateDirectory(StorageDirectory);
+                using var writer = new StreamWriter(File.Open(configPath, FileMode.Create));
+                writer.Write(JsonSerializer.Serialize(Whitelist)); 
             }
             return base.Autoload(ref name);
         }
@@ -40,8 +45,15 @@ namespace JBMiner.Systems
         // Unload so that we can properly fix the stream.
         public void Unload()
         {
-            using var str = new StreamWriter(File.Open(FolderPath(WhitelistFileName), FileMode.Create));
-            str.Write(JsonSerializer.Serialize(Whitelist)); // This makes the whitelist a string.
+            try
+            {
+                using var str = new StreamWriter(File.Open(FolderPath(WhitelistFileName), FileMode.Create));
+                str.Write(JsonSerializer.Serialize(Whitelist)); // This makes the whitelist a string.
+            }
+            catch
+            {
+                
+            }
         }
 
         // This whitelist contains all the blocks that we're currently looking for while mining.

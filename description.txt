@@ -8,9 +8,23 @@ Block whitelist.
 
 Release version is Major/Minor/Patch format.
 
-2.0.0:
-Release version
+
+2.2.0: Migrated to tModLoader 1.4.4
+
+2.1.3: Added terrible icon! :)
+
+2.1.2: Hotfix
+
+2.1.0:
+Networking! You can now play on a multiplayer server with this mod, happy mining!
 
 2.0.1:
 Added more tile IDs to the default whitelist.
 Fixed a bug where vein mining blocks would mine the first one twice, causing it to drop a dirt block.
+
+2.0.0:
+Release version
+
+
+
+
